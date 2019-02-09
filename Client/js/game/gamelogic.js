@@ -1,6 +1,13 @@
-define('gamelogic',['game','gameconfig','gamesocket','gamelevelparameters'],
-function (game,config,gamesocket,levelparams){
+define('gamelogic',[
+    'game',
+    'gameconfig',
+    'gamesocket',
+    'gamelevelparameters',
+    'gamejoystick'],
+function (game,config,gamesocket,levelparams, joystick){
   return{
+
+    flipflopfire : false,
 
     preload: function () {
       this.load.image('sea', 'static/assets/sea.png');
@@ -15,12 +22,13 @@ function (game,config,gamesocket,levelparams){
     create: function () {
       this.setupBackground();
       this.setupPlayers();
+      this.setuplogs();
       //this.setupEnemies();
       //this.setupBullets();
       //this.setupExplosions();
       //this.setupPlayerIcons();
       //this.setupText();
-      this.cursors = this.input.keyboard.createCursorKeys();
+      //this.cursors = this.input.keyboard.createCursorKeys();
       this.stage.disableVisibilityChange = true;
       //var enefactory=new CustomComponents();
       //var a = enefactory.get(1);
@@ -32,6 +40,9 @@ function (game,config,gamesocket,levelparams){
       gamesocket.socket.on('playerspositions', function(data) {
           levelparams.players=JSON.parse(data);
       });
+
+      joystick.keyfire.onDown.add(function(){gamesocket.socket.emit('client.fire',gamesocket.token);}, this);
+
     },
 
     update: function () {
@@ -39,6 +50,7 @@ function (game,config,gamesocket,levelparams){
       //this.spawnEnemies();
       this.updateplayers();
       this.processPlayerInput();
+      this.updatelogs();
       //this.processDelayedEffects();
     },
 
@@ -48,6 +60,20 @@ function (game,config,gamesocket,levelparams){
     },
     setupPlayers: function () {
       this.players=[];
+    },
+    setuplogs: function(){
+      this.logs = this.add.text(this.game.width / 2, 230,
+       'Jugadores:',
+       { font: '20px monospace', fill: '#fff', align: 'center' }
+      );
+      this.logs.anchor.setTo(0.5, 0.5);
+      //this.instExpire = this.time.now + config.INSTRUCTION_EXPIRE;
+      //this.score = 0;
+      //this.scoreText = this.add.text(
+      //  this.game.width / 2, 30, '' + this.score,
+      //  { font: '20px monospace', fill: '#fff', align: 'center' }
+      //);
+      //this.scoreText.anchor.setTo(0.5, 0.5);
     },
 
     updateplayers:function (){
@@ -82,6 +108,7 @@ function (game,config,gamesocket,levelparams){
         b.y=bs.y;
       }
 
+      // Creamos nuevos jugadores o los movemos.
       var i,ii,iof,iofb;
       for (i=0;i<levelparams.players.length;i++){
         iof=this.players.map(p=>p.id).indexOf(levelparams.players[i].id)
@@ -122,27 +149,15 @@ function (game,config,gamesocket,levelparams){
       }
 
     },
-
+    updatelogs:function(){
+      this.logs.text = JSON.stringify(levelparams.players, null, "\t");
+    },
     processPlayerInput: function () {
 
-      if (this.cursors.left.isDown)
-        gamesocket.socket.emit('client.move.left',gamesocket.token)
-      else if (this.cursors.right.isDown)
-        gamesocket.socket.emit('client.move.right',gamesocket.token)
-
-      if (this.cursors.up.isDown)
-        gamesocket.socket.emit('client.move.up',gamesocket.token)
-      else if (this.cursors.down.isDown)
-        gamesocket.socket.emit('client.move.down',gamesocket.token)
-
-      /*
-      if (this.input.activePointer.isDown &&
-        this.physics.arcade.distanceToPointer(this.player) > 15) {
-          this.physics.arcade.moveToPointer(this.player, this.player.speed);
-        }
-      */
-      if (this.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR))
-        gamesocket.socket.emit('client.fire',gamesocket.token)
+      if (joystick.keyleft.isDown) gamesocket.socket.emit('client.move.left',gamesocket.token)
+      else if (joystick.keyright.isDown)gamesocket.socket.emit('client.move.right',gamesocket.token)
+      if (joystick.keyup.isDown)   gamesocket.socket.emit('client.move.up',gamesocket.token)
+      else if (joystick.keydown.isDown) gamesocket.socket.emit('client.move.down',gamesocket.token)
 
     },
 
@@ -163,6 +178,8 @@ function (game,config,gamesocket,levelparams){
       // Then let's go back to the main menu.
       //this.state.start('MainMenu');
     },
+
+
     setupEnemies: function () {
       this.enemyPool = this.add.group();
       this.enemyPool.enableBody = true;

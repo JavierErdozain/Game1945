@@ -71,14 +71,12 @@ var game = function(){
   this.clientfire = function(id){
     var i = players.map(e=>e.id).indexOf(id)
     if (i==-1)return;
-    if (players[i].bullets.length<gameconfig.BULLETNUMERS){
-      var bulletid =players[i].bullets.length;
-      if(bulletid==10) bulletid=0;
+    if (players[i].bullets.length<=gameconfig.BULLETNUMERS){
+      var bulletid =players[i].bullets.length+1;
       players[i].bullets.push(
             new gameobjects.bullet(
               bulletid,players[i].x,
               players[i].y-(gameconfig.PLAYER_HEIGHT)));
-      bulletid+=1;
     }
 
   };

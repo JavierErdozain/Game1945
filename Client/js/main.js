@@ -14,7 +14,8 @@ requirejs.config({
         gamemenu:             'game/gamemenu',
         gamelogic:            'game/gamelogic',
         gamesocket:           'game/gamesocket',
-        gamelevelparameters:  'game/gamelevelparameters'
+        gamelevelparameters:  'game/gamelevelparameters',
+        gamejoystick:         'game/gamejoystick'
     },
 });
 
