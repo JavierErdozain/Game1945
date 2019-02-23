@@ -1,0 +1,12 @@
+[
+  {
+    "millisecond":5000,
+    "type":"enemyplane",
+    "position":{"x":100,"y":100}
+  },
+  {
+    "millisecond":3000,
+    "type":"enemyplane",
+    "position":{"x":100,"y":100}
+  }
+]

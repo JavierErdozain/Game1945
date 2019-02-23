@@ -82,7 +82,19 @@ function (game,config,gamesocket,levelparams, joystick){
         var plane = _this.add.sprite(p.x, p.y, 'player');
         plane.id=p.id
         plane.anchor.setTo(0.5, 0.5);
-        plane.animations.add('fly', [ 0, 1, 2 ], 20, true);
+        plane.animations.add('fly', [0,1,2], 20, true);
+        plane.play('fly');
+        _this.physics.enable(plane, Phaser.Physics.ARCADE);
+        plane.body.collideWorldBounds = true; //El jugador no puede salirse de los bordes de la pantalla
+        plane.body.setSize(20, 20, 0, -5);
+        plane.bullets=[];
+        return plane;
+      }
+      var createFriendlyPlayer=function(p){
+        var plane = _this.add.sprite(p.x, p.y, 'player');
+        plane.id=p.id
+        plane.anchor.setTo(0.5, 0.5);
+        plane.animations.add('fly', [3], 20, true);
         plane.play('fly');
         _this.physics.enable(plane, Phaser.Physics.ARCADE);
         plane.body.collideWorldBounds = true; //El jugador no puede salirse de los bordes de la pantalla
@@ -115,7 +127,10 @@ function (game,config,gamesocket,levelparams, joystick){
 
         // Creamos o movemos a los jugadores.
         if(iof==-1){
-          this.players.push(createPlayer(levelparams.players[i]));
+          if(levelparams.players[i].id==gamesocket.token)
+            this.players.push(createPlayer(levelparams.players[i]));
+          else
+            this.players.push(createFriendlyPlayer(levelparams.players[i]));
           continue;
         }else
           movePlayer(this.players[iof],levelparams.players[i]);

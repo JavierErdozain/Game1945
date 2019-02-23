@@ -2,15 +2,19 @@
 var game = function(){
   var gameobjects= require('./gameobjects');    // Definición de objetos del juego.
   var gameconfig= require('./gameconfig');      // Valores de configuración del juego.
+  var fs = require('fs');
 
   var socketcontroller;                         // Comunicador con los clientes.
   var tickLengthMs = 1000 / 20                  // Fecuencia con la que envia datos a los clientes.
   var previousTick = Date.now()
 
+  var loadlevelinstructions=function(){
+    var levelconfig = JSON.parse(fs.readFileSync('game/levels/level01.json', 'utf8'));
+    levelconfig.sort((a,b) => (a.millisecond > b.millisecond) ? 1 : ((b.millisecond > a.millisecond) ? -1 : 0));
+    for (var i=0;i<levelconfig.length;i++)
+      setTimeout(levelconfig[i].type,levelconfig[i].millisecond);
 
-  //var actualTicks = 0
-  //var gameend = Date.now() + 10000;
-
+  }
   var gameLoop = function () {
     var updateBullets = function(){
       var i,ib;
@@ -85,6 +89,7 @@ var game = function(){
   };
   this.run=function (socket){
     socketcontroller=socket;
+    loadlevelinstructions();
     gameLoop();
   };
 }
