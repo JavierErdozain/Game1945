@@ -21,6 +21,7 @@ function (game,config,gamesocket,levelparams, joystick){
     create: function () {
       this.setupBackground();
       this.setupPlayers();
+      this.setupExplosions();
       this.setuplogs();
       //this.setupEnemies();
       //this.setupBullets();
@@ -44,10 +45,10 @@ function (game,config,gamesocket,levelparams, joystick){
 
     },
     update: function () {
-      //this.checkCollisions();
       //this.spawnEnemies();
       this.updateplayers();
       this.updateenemys();
+      this.updateexplosions();
       this.processPlayerInput();
       this.updatelogs();
       //this.processDelayedEffects();
@@ -73,6 +74,17 @@ function (game,config,gamesocket,levelparams, joystick){
       //  { font: '20px monospace', fill: '#fff', align: 'center' }
       //);
       //this.scoreText.anchor.setTo(0.5, 0.5);
+    },
+    setupExplosions: function () {
+      this.explosionPool = this.add.group();
+      this.explosionPool.enableBody = true;
+      this.explosionPool.physicsBodyType = Phaser.Physics.ARCADE;
+      this.explosionPool.createMultiple(100, 'explosion');
+      this.explosionPool.setAll('anchor.x', 0.5);
+      this.explosionPool.setAll('anchor.y', 0.5);
+      this.explosionPool.forEach(function (explosion) {
+        explosion.animations.add('boom');
+      });
     },
 
     updateplayers:function (){
@@ -207,6 +219,19 @@ function (game,config,gamesocket,levelparams, joystick){
     updatelogs:function(){
       this.logs.text = JSON.stringify(levelparams, null, "\t");
     },
+    updateexplosions:function(){
+      for (var i =0;i<levelparams.explosions.length;i++){
+        if (this.explosionPool.countDead() === 0) {
+          return;
+        }
+        var explosion = this.explosionPool.getFirstExists(false);
+        //explosion.reset(sprite.x, sprite.y);
+        explosion.play('boom', 15, false, true);
+        // add the original sprite's velocity to the explosion
+        explosion.body.x = levelparams.explosions[i].x;
+        explosion.body.y = levelparams.explosions[i].y;
+      };
+    },
     processPlayerInput: function () {
 
       if (joystick.keyleft.isDown) gamesocket.socket.emit('client.move.left',gamesocket.token)
@@ -306,17 +331,7 @@ function (game,config,gamesocket,levelparams, joystick){
       this.nextShotAt = 0;
       this.shotDelay = config.SHOT_DELAY;
     },
-    setupExplosions: function () {
-      this.explosionPool = this.add.group();
-      this.explosionPool.enableBody = true;
-      this.explosionPool.physicsBodyType = Phaser.Physics.ARCADE;
-      this.explosionPool.createMultiple(100, 'explosion');
-      this.explosionPool.setAll('anchor.x', 0.5);
-      this.explosionPool.setAll('anchor.y', 0.5);
-      this.explosionPool.forEach(function (explosion) {
-        explosion.animations.add('boom');
-      });
-    },
+
     setupText: function () {
       this.instructions = this.add.text( this.game.width / 2, this.game.height - 100,
        'Use Arrow Keys to Move, Press Z to Fire\n' + 'Tapping/clicking does both',

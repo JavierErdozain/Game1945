@@ -6,9 +6,10 @@ var game = function(){
   var fs = require('fs');                       // Lector de ficheros.
 
   var roomgame = {
-    "players":[],   // Jugadores de la partida.
-    "enemys":[],    // Enemigos de la partida.
-    "time":0        // Tiempo de juego.
+    "players":[],     // Jugadores de la partida.
+    "enemys":[],      // Enemigos de la partida.
+    "explosions":[],  // Explosiones.
+    "time":0          // Tiempo de juego.
   };
 
   var socketcontroller;                         // Comunicador con los clientes.
@@ -50,18 +51,26 @@ var game = function(){
             ((a.x + a.width) < b.x) ||
             (a.x > (b.x + b.width))
         );
-      }
+      };
       // Colisiones avión contra avión.
       var colisiones_jugadores = [];
       var colisiones_ememigos = [];
+      roomgame.explosions=[];
       for (var i=0;i<roomgame.players.length;i++){
         for (var e=0;e<roomgame.enemys.length;e++){
           if (isCollide(roomgame.players[i],roomgame.enemys[e])){
             colisiones_jugadores.push(i);
             colisiones_ememigos.push(e);
+            roomgame.explosions.push(new gameobjects.explosion(roomgame.players[i].x, roomgame.players[i].y));
+            roomgame.explosions.push(new gameobjects.explosion(roomgame.enemys[e].x, roomgame.enemys[e].y));
           }
         }
       }
+      for (var i=0;i<colisiones_jugadores.length;i++)
+        roomgame.players.splice(roomgame.players.map(e=>e.id).indexOf(colisiones_jugadores[i]),1);
+      for (var i=0;i<colisiones_ememigos.length;i++)
+        roomgame.enemys.splice(roomgame.enemys.map(e=>e.id).indexOf(colisiones_ememigos[i]),1);
+
 
       // Colisiones proyectiles aviones contra aviones enemigos.
       // Colisiones proyectiles enemigos contra aviones jugadores.
@@ -78,10 +87,8 @@ var game = function(){
 
     }
 
-    if (Date.now() - previousTick < tickLengthMs - 16)
-      setTimeout(gameLoop)
-    else
-      setImmediate(gameLoop)
+    if (Date.now() - previousTick < tickLengthMs - 16) setTimeout(gameLoop)
+    else setImmediate(gameLoop)
   }
 
   this.addnewplayer=function (id){

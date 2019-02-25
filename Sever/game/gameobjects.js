@@ -37,6 +37,11 @@ var gameobjects = function(){
     this.height=20;
     this.width=20;
   };
+
+  this.explosion=function(x,y){
+    this.x = x
+    this.y = y
+  }
 }
 
 module.exports = new gameobjects()
