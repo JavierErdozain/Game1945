@@ -13,6 +13,8 @@ var gameobjects = function(){
     this.speed = gameconfig.PLAYER_SPEED;
     this.firetype = 1;
     this.bullets=[];
+    this.height=20;
+    this.width=20;
   };
 
   // Proyectiles.
@@ -32,6 +34,8 @@ var gameobjects = function(){
     this.speed = gameconfig.ENEMY_SPEED;
     this.firetype = 1;
     this.bullets=[];
+    this.height=20;
+    this.width=20;
   };
 }
 

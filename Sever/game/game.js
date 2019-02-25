@@ -41,14 +41,38 @@ var game = function(){
         if (roomgame.enemys[i].y>=600)
           roomgame.enemys.splice(roomgame.enemys.map(e=>e.id).indexOf(roomgame.enemys[i].id),1);
       }
-    }
+    };
+    var calculateCollisions = function(){
+      var isCollide = function(a, b) {
+        return !(
+            ((a.y + a.height) < (b.y)) ||
+            (a.y > (b.y + b.height)) ||
+            ((a.x + a.width) < b.x) ||
+            (a.x > (b.x + b.width))
+        );
+      }
+      // Colisiones avión contra avión.
+      var colisiones_jugadores = [];
+      var colisiones_ememigos = [];
+      for (var i=0;i<roomgame.players.length;i++){
+        for (var e=0;e<roomgame.enemys.length;e++){
+          if (isCollide(roomgame.players[i],roomgame.enemys[e])){
+            colisiones_jugadores.push(i);
+            colisiones_ememigos.push(e);
+          }
+        }
+      }
+
+      // Colisiones proyectiles aviones contra aviones enemigos.
+      // Colisiones proyectiles enemigos contra aviones jugadores.
+    };
     var now = Date.now()
 
     if (previousTick + tickLengthMs <= now) {
       previousTick = now
       updateBullets();
       updateEnemys();
-      //calculateCollisions();
+      calculateCollisions();
 
       socketcontroller.emit('playerspositions', JSON.stringify(roomgame))
 
