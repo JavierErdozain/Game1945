@@ -29,7 +29,7 @@ var game = function(){
       var i,ib;
       for (i=0;i<roomgame.players.length;i++){
         for (ib=0;ib<roomgame.players[i].bullets.length;ib++){
-          roomgame.players[i].bullets[ib].y-=4;
+          roomgame.players[i].bullets[ib].y-=gameconfig.FIRE_BASIC_VELOCITY;
           if (roomgame.players[i].bullets[ib].y<=3)
             roomgame.players[i].bullets.splice(roomgame.players[i].bullets.map(e=>e.id).indexOf(roomgame.players[i].bullets[ib].id),1);
         }
@@ -38,7 +38,7 @@ var game = function(){
     var updateEnemys = function(){
       for (var i=0;i<roomgame.enemys.length;i++){
         roomgame.enemys[i].y+=4;
-        if (roomgame.enemys[i].y>600)
+        if (roomgame.enemys[i].y>=600)
           roomgame.enemys.splice(roomgame.enemys.map(e=>e.id).indexOf(roomgame.enemys[i].id),1);
       }
     }

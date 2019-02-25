@@ -3,7 +3,7 @@ var gameconfig = function() {
 
   this.PLAYER_SPEED = 4;
   this.PLAYER_HEIGHT = 20;
-  this.FIRE_BASIC_VELOCITY = 60;
+  this.FIRE_BASIC_VELOCITY = 25;
   this.BULLETNUMERS=10;
 
   this.ENEMY_SPEED = 4;

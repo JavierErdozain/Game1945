@@ -1,5 +1,5 @@
-define ('gamejoystick',['game'],
-  function(game){
+define ('gamejoystick',['Phaser','game'],
+  function(p,game){
     return {
       keyup : game.input.keyboard.addKey(Phaser.Keyboard.UP),
       keydown : game.input.keyboard.addKey(Phaser.Keyboard.DOWN),

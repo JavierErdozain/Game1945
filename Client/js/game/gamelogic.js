@@ -9,7 +9,6 @@ function (game,config,gamesocket,levelparams, joystick){
 
     flipflopfire : false,
     enemys:[],
-
     preload: function () {
       this.load.image('sea', 'static/assets/sea.png');
       this.load.image('bullet', 'static/assets/bullet.png');
@@ -19,7 +18,6 @@ function (game,config,gamesocket,levelparams, joystick){
       this.load.spritesheet('explosion', 'static/assets/explosion.png', 32, 32);
       this.load.spritesheet('player', 'static/assets/player.png', 64, 64);
     },
-
     create: function () {
       this.setupBackground();
       this.setupPlayers();
@@ -45,7 +43,6 @@ function (game,config,gamesocket,levelparams, joystick){
       joystick.keyfire.onDown.add(function(){gamesocket.socket.emit('client.fire',gamesocket.token);}, this);
 
     },
-
     update: function () {
       //this.checkCollisions();
       //this.spawnEnemies();
@@ -150,8 +147,9 @@ function (game,config,gamesocket,levelparams, joystick){
         for (ii=0;ii<this.players[iof].bullets.length;ii++){
           iofb=levelparams.players[i].bullets.map(p=>p.id).indexOf(this.players[iof].bullets[ii].id)
           if (iofb==-1){
-            this.players[iof].bullets[ii].destroy();
-            this.players[iof].bullets.splice(ii,1);
+            var indx = this.players[iof].bullets.map(p=>p.id).indexOf(this.players[iof].bullets[ii].id)
+            this.players[iof].bullets[indx].destroy();
+            this.players[iof].bullets.splice(indx,1);
           }
         }
       }
@@ -160,8 +158,9 @@ function (game,config,gamesocket,levelparams, joystick){
       for (i=0;i<this.players.length;i++){
         iof=levelparams.players.map(p=>p.id).indexOf(this.players[i].id)
         if (iof==-1){
-          this.players[i].destroy();
-          this.players.splice(i,1);
+          var indx =this.players.map(p=>p.id).indexOf(this.players[i].id)
+          this.players[indx].destroy();
+          this.players.splice(indx,1);
         }
       }
 
@@ -193,15 +192,14 @@ function (game,config,gamesocket,levelparams, joystick){
           continue;
         }else
           moveenemy(this.enemys[iof],levelparams.enemys[i]);
-
-        // Eliminamos los enemigos fuera del juego.
-        var iofb;
-        for (var ii=0;ii<this.enemys.length;ii++){
-          var iofb=levelparams.enemys.map(p=>p.id).indexOf(this.enemys[ii].id)
-          if (iofb==-1){
-            this.enemys[ii].destroy();
-            this.enemys.splice(ii,1);
-          }
+      }
+      // Eliminamos los enemigos fuera del juego.
+      for (var e in this.enemys){
+        var iofb=levelparams.enemys.map(p=>p.id).indexOf(this.enemys[e].id)
+        if (iofb==-1) {
+          var indx=this.enemys.map(p=>p.id).indexOf(this.enemys[e].id)
+          this.enemys[indx].destroy();
+          this.enemys.splice(indx,1);
         }
       }
 
