@@ -184,7 +184,7 @@ function (game,config,gamesocket,levelparams, joystick){
         p.x=ps.x;
         p.y=ps.y;
       }
-      for (i=0;i<levelparams.enemys.length;i++){
+      for (var i=0;i<levelparams.enemys.length;i++){
         iof=this.enemys.map(p=>p.id).indexOf(levelparams.enemys[i].id)
 
         // Creamos o movemos a los enemigos.
@@ -193,11 +193,21 @@ function (game,config,gamesocket,levelparams, joystick){
           continue;
         }else
           moveenemy(this.enemys[iof],levelparams.enemys[i]);
+
+        // Eliminamos los enemigos fuera del juego.
+        var iofb;
+        for (var ii=0;ii<this.enemys.length;ii++){
+          var iofb=levelparams.enemys.map(p=>p.id).indexOf(this.enemys[ii].id)
+          if (iofb==-1){
+            this.enemys[ii].destroy();
+            this.enemys.splice(ii,1);
+          }
+        }
       }
 
     },
     updatelogs:function(){
-      this.logs.text = JSON.stringify(levelparams.players, null, "\t");
+      this.logs.text = JSON.stringify(levelparams, null, "\t");
     },
     processPlayerInput: function () {
 

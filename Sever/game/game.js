@@ -19,7 +19,7 @@ var game = function(){
     var levelconfig = JSON.parse(fs.readFileSync('game/levels/level01.json', 'utf8'));
     levelconfig.sort((a,b) => (a.millisecond > b.millisecond) ? 1 : ((b.millisecond > a.millisecond) ? -1 : 0));
     var addenemyplane = function(act){
-      roomgame.enemys.push(new gameobjects.enemy(act.id,act.position.x,act.position.y));
+      roomgame.enemys.push(new gameobjects.enemy(act.id,act.x,act.y));
     }
     for (var i=0;i<levelconfig.length;i++)
       setTimeout(addenemyplane,levelconfig[i].millisecond,levelconfig[i]);
@@ -34,13 +34,20 @@ var game = function(){
             roomgame.players[i].bullets.splice(roomgame.players[i].bullets.map(e=>e.id).indexOf(roomgame.players[i].bullets[ib].id),1);
         }
       }
+    };
+    var updateEnemys = function(){
+      for (var i=0;i<roomgame.enemys.length;i++){
+        roomgame.enemys[i].y+=4;
+        if (roomgame.enemys[i].y>600)
+          roomgame.enemys.splice(roomgame.enemys.map(e=>e.id).indexOf(roomgame.enemys[i].id),1);
+      }
     }
     var now = Date.now()
 
     if (previousTick + tickLengthMs <= now) {
       previousTick = now
       updateBullets();
-
+      updateEnemys();
       //calculateCollisions();
 
       socketcontroller.emit('playerspositions', JSON.stringify(roomgame))
