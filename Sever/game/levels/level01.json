@@ -1,12 +1,14 @@
 [
   {
+    "id":"e0001",
     "millisecond":5000,
     "type":"enemyplane",
     "position":{"x":100,"y":100}
   },
   {
+    "id":"e0002",
     "millisecond":3000,
     "type":"enemyplane",
-    "position":{"x":100,"y":100}
+    "position":{"x":300,"y":100}
   }
 ]

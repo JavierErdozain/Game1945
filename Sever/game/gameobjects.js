@@ -23,6 +23,16 @@ var gameobjects = function(){
     this.y=y;
   };
 
+  // Enemy.
+  this.enemy=function (id, x, y){
+    this.x = x
+    this.y = y
+    this.angle = 0
+    this.id=id
+    this.speed = gameconfig.ENEMY_SPEED;
+    this.firetype = 1;
+    this.bullets=[];
+  };
 }
 
 module.exports = new gameobjects()

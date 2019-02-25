@@ -8,6 +8,7 @@ function (game,config,gamesocket,levelparams, joystick){
   return{
 
     flipflopfire : false,
+    enemys:[],
 
     preload: function () {
       this.load.image('sea', 'static/assets/sea.png');
@@ -38,7 +39,7 @@ function (game,config,gamesocket,levelparams, joystick){
           console.log('connection established');
       });
       gamesocket.socket.on('playerspositions', function(data) {
-          levelparams.players=JSON.parse(data);
+          levelparams=JSON.parse(data);
       });
 
       joystick.keyfire.onDown.add(function(){gamesocket.socket.emit('client.fire',gamesocket.token);}, this);
@@ -49,6 +50,7 @@ function (game,config,gamesocket,levelparams, joystick){
       //this.checkCollisions();
       //this.spawnEnemies();
       this.updateplayers();
+      this.updateenemys();
       this.processPlayerInput();
       this.updatelogs();
       //this.processDelayedEffects();
@@ -64,7 +66,7 @@ function (game,config,gamesocket,levelparams, joystick){
     setuplogs: function(){
       this.logs = this.add.text(this.game.width / 2, 230,
        'Jugadores:',
-       { font: '20px monospace', fill: '#fff', align: 'center' }
+       { font: '10px monospace', fill: '#fff', align: 'center' }
       );
       this.logs.anchor.setTo(0.5, 0.5);
       //this.instExpire = this.time.now + config.INSTRUCTION_EXPIRE;
@@ -161,6 +163,36 @@ function (game,config,gamesocket,levelparams, joystick){
           this.players[i].destroy();
           this.players.splice(i,1);
         }
+      }
+
+    },
+    updateenemys:function(){
+      var _this=this;
+      var createenemy=function(p){
+        var plane = _this.add.sprite(p.x, p.y, 'greenEnemy');
+        plane.id=p.id
+        plane.anchor.setTo(0.5, 0.5);
+        plane.animations.add('fly', [0,1,2], 20, true);
+        plane.play('fly');
+        _this.physics.enable(plane, Phaser.Physics.ARCADE);
+        plane.body.collideWorldBounds = false; //El jugador no puede salirse de los bordes de la pantalla
+        plane.body.setSize(20, 20, 0, -5);
+        plane.bullets=[];
+        return plane;
+      }
+      var moveenemy=function(p,ps){
+        p.x=ps.x;
+        p.y=ps.y;
+      }
+      for (i=0;i<levelparams.enemys.length;i++){
+        iof=this.enemys.map(p=>p.id).indexOf(levelparams.enemys[i].id)
+
+        // Creamos o movemos a los enemigos.
+        if(iof==-1){
+          this.enemys.push(createenemy(levelparams.enemys[i]));
+          continue;
+        }else
+          moveenemy(this.enemys[iof],levelparams.enemys[i]);
       }
 
     },

@@ -1,6 +1,7 @@
 define('gamelevelparameters',[], function(){
   return {
-    players:{}
+    players:{},
+    enemys:{},
   }
 
 })

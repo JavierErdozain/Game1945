@@ -3,8 +3,10 @@ var gameconfig = function() {
 
   this.PLAYER_SPEED = 4;
   this.PLAYER_HEIGHT = 20;
-  this.FIRE_BASIC_VELOCITY = 30;
+  this.FIRE_BASIC_VELOCITY = 60;
   this.BULLETNUMERS=10;
+
+  this.ENEMY_SPEED = 4;
 }
 
   //this.SCREEN_WIDTH=800
