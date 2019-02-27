@@ -22,8 +22,11 @@ var game = function(){
     var addenemyplane = function(act){
       roomgame.enemys.push(new gameobjects.enemy(act.id,act.x,act.y));
     }
-    for (var i=0;i<levelconfig.length;i++)
-      setTimeout(addenemyplane,levelconfig[i].millisecond,levelconfig[i]);
+    for(var l=0;l<100;l++){
+      for (var i=0;i<levelconfig.length;i++)
+        setTimeout(addenemyplane,levelconfig[i].millisecond + (l * 8000) ,levelconfig[i]);
+    }
+
   };
   var gameLoop = function () {
     var updateBullets = function(){
@@ -75,7 +78,7 @@ var game = function(){
             roomgame.explosions.push(new gameobjects.explosion(roomgame.enemys[e].x, roomgame.enemys[e].y));
             roomgame.enemys.splice(roomgame.enemys.map(e=>e.id).indexOf(roomgame.enemys[e].id),1);
             roomgame.players.splice(roomgame.players.map(e=>e.id).indexOf(roomgame.players[p].id),1);
-            break;            
+            break;
           }
 
         // Colisiones proyectiles enemigos contra aviones jugadores.
