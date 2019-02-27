@@ -23,6 +23,8 @@ var gameobjects = function(){
     this.speed =gameconfig.FIRE_BASIC_VELOCITY;
     this.x=x;
     this.y=y;
+    this.height=5;
+    this.width=5;
   };
 
   // Enemy.

@@ -34,7 +34,7 @@ define('gamepreloader',['game'], function (game){
       this.load.audio('enemyFire', ['static/assets/enemy-fire.ogg', 'static/assets/enemy-fire.wav']);
       this.load.audio('playerFire', ['static/assets/player-fire.ogg', 'static/assets/player-fire.wav']);
       this.load.audio('powerUp', ['static/assets/powerup.ogg', 'static/assets/powerup.wav']);
-      //this.load.audio('titleMusic', ['audio/main_menu.mp3']);
+      //this.load.audio('GameMusic', ['static/assert/La Polla Records - Johnny.ogg']);
       //  + lots of other required assets here
 
     },

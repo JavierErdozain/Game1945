@@ -4,11 +4,12 @@ define('gamelogic',[
     'gamesocket',
     'gamelevelparameters',
     'gamejoystick'],
-function (game,config,gamesocket,levelparams, joystick){
+function (game,config,gamesocket,levelparams,gamejoystick){
   return{
 
     flipflopfire : false,
     enemys:[],
+    joystick:{},
     preload: function () {
       this.load.image('sea', 'static/assets/sea.png');
       this.load.image('bullet', 'static/assets/bullet.png');
@@ -17,15 +18,18 @@ function (game,config,gamesocket,levelparams, joystick){
       this.load.spritesheet('whiteEnemy', 'static/assets/shooting-enemy.png', 32, 32);
       this.load.spritesheet('explosion', 'static/assets/explosion.png', 32, 32);
       this.load.spritesheet('player', 'static/assets/player.png', 64, 64);
+      //this.load.audio('GameMusic', ['static/assert/La Polla Records - Johnny.ogg']);
     },
     create: function () {
+      this.keys = this.game.input.keyboard.createCursorKeys();
+      this.joystick=gamejoystick.getjoystick();
       this.setupBackground();
       this.setupPlayers();
       this.setupExplosions();
       this.setuplogs();
       //this.setupEnemies();
       //this.setupBullets();
-      //this.setupExplosions();
+
       //this.setupPlayerIcons();
       //this.setupText();
       //this.cursors = this.input.keyboard.createCursorKeys();
@@ -41,7 +45,8 @@ function (game,config,gamesocket,levelparams, joystick){
           levelparams=JSON.parse(data);
       });
 
-      joystick.keyfire.onDown.add(function(){gamesocket.socket.emit('client.fire',gamesocket.token);}, this);
+      this.joystick.keyfire.onDown.add(function(){gamesocket.socket.emit('client.fire',gamesocket.token);}, this);
+
 
     },
     update: function () {
@@ -119,7 +124,7 @@ function (game,config,gamesocket,levelparams, joystick){
         bullet.anchor.setTo(0.5, 0.5);
         _this.physics.enable(bullet, Phaser.Physics.ARCADE);
         bullet.body.collideWorldBounds = false;
-        bullet.body.setSize(20, 20, 0, -5);
+        bullet.body.setSize(5, 5, 0, -5);
         return bullet;
       }
       var movePlayer=function(p,ps){
@@ -220,24 +225,24 @@ function (game,config,gamesocket,levelparams, joystick){
       this.logs.text = JSON.stringify(levelparams, null, "\t");
     },
     updateexplosions:function(){
-      for (var i =0;i<levelparams.explosions.length;i++){
+      for (var e in levelparams.explosions){
         if (this.explosionPool.countDead() === 0) {
           return;
         }
         var explosion = this.explosionPool.getFirstExists(false);
-        //explosion.reset(sprite.x, sprite.y);
+        explosion.reset(levelparams.explosions[e].x, levelparams.explosions[e].y);
         explosion.play('boom', 15, false, true);
         // add the original sprite's velocity to the explosion
-        explosion.body.x = levelparams.explosions[i].x;
-        explosion.body.y = levelparams.explosions[i].y;
+        //explosion.body.x = levelparams.explosions[i].x;
+        //explosion.body.y = levelparams.explosions[i].y;
       };
     },
     processPlayerInput: function () {
 
-      if (joystick.keyleft.isDown) gamesocket.socket.emit('client.move.left',gamesocket.token)
-      else if (joystick.keyright.isDown)gamesocket.socket.emit('client.move.right',gamesocket.token)
-      if (joystick.keyup.isDown)   gamesocket.socket.emit('client.move.up',gamesocket.token)
-      else if (joystick.keydown.isDown) gamesocket.socket.emit('client.move.down',gamesocket.token)
+      if (this.joystick.keyleft.isDown) gamesocket.socket.emit('client.move.left',gamesocket.token)
+      else if (this.joystick.keyright.isDown)gamesocket.socket.emit('client.move.right',gamesocket.token)
+      if (this.joystick.keyup.isDown)   gamesocket.socket.emit('client.move.up',gamesocket.token)
+      else if (this.joystick.keydown.isDown) gamesocket.socket.emit('client.move.down',gamesocket.token)
 
     },
 

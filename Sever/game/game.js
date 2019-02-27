@@ -52,28 +52,36 @@ var game = function(){
             (a.x > (b.x + b.width))
         );
       };
-      // Colisiones avión contra avión.
-      var colisiones_jugadores = [];
-      var colisiones_ememigos = [];
+
       roomgame.explosions=[];
-      for (var i=0;i<roomgame.players.length;i++){
-        for (var e=0;e<roomgame.enemys.length;e++){
-          if (isCollide(roomgame.players[i],roomgame.enemys[e])){
-            colisiones_jugadores.push(i);
-            colisiones_ememigos.push(e);
-            roomgame.explosions.push(new gameobjects.explosion(roomgame.players[i].x, roomgame.players[i].y));
+
+      // Colisiones de cada avion.
+      for (var p in roomgame.players){
+
+        // Colisiones proyectiles del jugador.
+        for(var b in roomgame.players[p].bullets)
+          for (var e in roomgame.enemys)
+            if (isCollide(roomgame.players[p].bullets[b],roomgame.enemys[e])){
+              roomgame.explosions.push(new gameobjects.explosion(roomgame.enemys[e].x, roomgame.enemys[e].y));
+              roomgame.enemys.splice(roomgame.enemys.map(e=>e.id).indexOf(roomgame.enemys[e].id),1);
+              roomgame.players[p].bullets.splice(roomgame.players[p].bullets.map(e=>e.id).indexOf(roomgame.players[p].bullets[b].id),1);
+              break;
+            }
+
+        // Colisiones del propio jugador con otros jugadores.
+        for (var e in roomgame.enemys)
+          if (isCollide(roomgame.players[p],roomgame.enemys[e])){
+            roomgame.explosions.push(new gameobjects.explosion(roomgame.players[p].x, roomgame.players[p].y));
             roomgame.explosions.push(new gameobjects.explosion(roomgame.enemys[e].x, roomgame.enemys[e].y));
+            roomgame.enemys.splice(roomgame.enemys.map(e=>e.id).indexOf(roomgame.enemys[e].id),1);
+            roomgame.players.splice(roomgame.players.map(e=>e.id).indexOf(roomgame.players[p].id),1);
+            break;            
           }
-        }
+
+        // Colisiones proyectiles enemigos contra aviones jugadores.
+
       }
-      for (var i=0;i<colisiones_jugadores.length;i++)
-        roomgame.players.splice(roomgame.players.map(e=>e.id).indexOf(colisiones_jugadores[i]),1);
-      for (var i=0;i<colisiones_ememigos.length;i++)
-        roomgame.enemys.splice(roomgame.enemys.map(e=>e.id).indexOf(colisiones_ememigos[i]),1);
 
-
-      // Colisiones proyectiles aviones contra aviones enemigos.
-      // Colisiones proyectiles enemigos contra aviones jugadores.
     };
     var now = Date.now()
 
@@ -83,8 +91,7 @@ var game = function(){
       updateEnemys();
       calculateCollisions();
 
-      socketcontroller.emit('playerspositions', JSON.stringify(roomgame))
-
+      socketcontroller.emit('playerspositions', JSON.stringify(roomgame));
     }
 
     if (Date.now() - previousTick < tickLengthMs - 16) setTimeout(gameLoop)
