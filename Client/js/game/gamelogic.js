@@ -27,15 +27,14 @@ function (game,config,gamesocket,levelparams,gamejoystick){
       this.setupPlayers();
       this.setupExplosions();
       this.setuplogs();
-      //this.setupEnemies();
-      //this.setupBullets();
 
-      //this.setupPlayerIcons();
-      //this.setupText();
-      //this.cursors = this.input.keyboard.createCursorKeys();
+      // Barra superior de objetos. Vidas, puntuación, etc.
+      this.setupScore();
+      this.setupPlayerIcons();
+
       this.stage.disableVisibilityChange = true;
-      //var enefactory=new CustomComponents();
-      //var a = enefactory.get(1);
+
+      // Comunicación socket.
       gamesocket.connect();
       gamesocket.socket.on('connect', function(data) {
         gamesocket.token=gamesocket.socket.id;
@@ -45,8 +44,8 @@ function (game,config,gamesocket,levelparams,gamejoystick){
           levelparams=JSON.parse(data);
       });
 
+      // Configuración del botón disparo. Evitamos rafagas.
       this.joystick.keyfire.onDown.add(function(){gamesocket.socket.emit('client.fire',gamesocket.token);}, this);
-
 
     },
     update: function () {
@@ -56,6 +55,7 @@ function (game,config,gamesocket,levelparams,gamejoystick){
       this.updateexplosions();
       this.processPlayerInput();
       this.updatelogs();
+      this.updateScore();
       //this.processDelayedEffects();
     },
 
@@ -90,6 +90,23 @@ function (game,config,gamesocket,levelparams,gamejoystick){
       this.explosionPool.forEach(function (explosion) {
         explosion.animations.add('boom');
       });
+    },
+    setupScore:function(){
+      this.scoreText = this.add.text(
+        this.game.width / 2, 30, '' + 0,
+        { font: '20px monospace', fill: '#fff', align: 'center' }
+      );
+      this.scoreText.anchor.setTo(0.5, 0.5);
+    },
+    setupPlayerIcons: function () {
+      this.lives = this.add.group();
+      // calculate location of first life icon
+      var firstLifeIconX = this.game.width - 10 - (config.PLAYER_EXTRA_LIVES * 30);
+      for (var i = 0; i < config.PLAYER_EXTRA_LIVES; i++) {
+        var life = this.lives.create(firstLifeIconX + (30 * i), 30, 'player');
+        life.scale.setTo(0.5, 0.5);
+        life.anchor.setTo(0.5, 0.5);
+      }
     },
 
     updateplayers:function (){
@@ -222,7 +239,7 @@ function (game,config,gamesocket,levelparams,gamejoystick){
 
     },
     updatelogs:function(){
-      this.logs.text = JSON.stringify(levelparams, null, "\t");
+      //this.logs.text = JSON.stringify(levelparams.players, null, "\t");
     },
     updateexplosions:function(){
       for (var e in levelparams.explosions){
@@ -236,6 +253,11 @@ function (game,config,gamesocket,levelparams,gamejoystick){
         //explosion.body.x = levelparams.explosions[i].x;
         //explosion.body.y = levelparams.explosions[i].y;
       };
+    },
+    updateScore:function(){
+      let iof=levelparams.players.map(p=>p.id).indexOf(gamesocket.token);
+      if(iof!=-1)
+        this.scoreText.text = levelparams.players[iof].score;
     },
     processPlayerInput: function () {
 
@@ -351,16 +373,7 @@ function (game,config,gamesocket,levelparams,gamejoystick){
       );
       this.scoreText.anchor.setTo(0.5, 0.5);
     },
-    setupPlayerIcons: function () {
-      this.lives = this.add.group();
-      // calculate location of first life icon
-      var firstLifeIconX = this.game.width - 10 - (config.PLAYER_EXTRA_LIVES * 30);
-      for (var i = 0; i < config.PLAYER_EXTRA_LIVES; i++) {
-        var life = this.lives.create(firstLifeIconX + (30 * i), 30, 'player');
-        life.scale.setTo(0.5, 0.5);
-        life.anchor.setTo(0.5, 0.5);
-      }
-    },
+
 
     checkCollisions: function () {
       this.physics.arcade.overlap(

@@ -20,7 +20,7 @@ var game = function(){
     var levelconfig = JSON.parse(fs.readFileSync('game/levels/level01.json', 'utf8'));
     levelconfig.sort((a,b) => (a.millisecond > b.millisecond) ? 1 : ((b.millisecond > a.millisecond) ? -1 : 0));
     var addenemyplane = function(act){
-      roomgame.enemys.push(new gameobjects.enemy(act.id,act.x,act.y));
+      roomgame.enemys.push(new gameobjects.enemy(act.id,act.x,act.y,act.points));
     }
     for(var l=0;l<100;l++){
       for (var i=0;i<levelconfig.length;i++)
@@ -58,6 +58,8 @@ var game = function(){
 
       roomgame.explosions=[];
 
+      var deadenemy=[];
+      var deadbullet=[];
       // Colisiones de cada avion.
       for (let p in roomgame.players){
 
@@ -65,23 +67,26 @@ var game = function(){
         for(let b in roomgame.players[p].bullets)
           for (let e in roomgame.enemys)
             if (isCollide(roomgame.players[p].bullets[b],roomgame.enemys[e])){
-              roomgame.explosions.push(new gameobjects.explosion(roomgame.enemys[e].x, roomgame.enemys[e].y));
-              roomgame.enemys.splice(roomgame.enemys.map(e=>e.id).indexOf(roomgame.enemys[e].id),1);
-              roomgame.players[p].bullets.splice(roomgame.players[p].bullets.map(e=>e.id).indexOf(roomgame.players[p].bullets[b].id),1);
-              break;
+              roomgame.players[p].score+=roomgame.enemys[e].points;
+              deadenemy.push(roomgame.enemys[e]);
+              deadbullet.push(roomgame.players[p].bullets[b]);
             }
 
         // Colisiones del propio jugador con otros jugadores.
         for (let e in roomgame.enemys)
           if (isCollide(roomgame.players[p],roomgame.enemys[e])){
-            roomgame.explosions.push(new gameobjects.explosion(roomgame.players[p].x, roomgame.players[p].y));
-            roomgame.explosions.push(new gameobjects.explosion(roomgame.enemys[e].x, roomgame.enemys[e].y));
-            roomgame.enemys.splice(roomgame.enemys.map(f=>f.id).indexOf(roomgame.enemys[e].id),1);
-            roomgame.players.splice(roomgame.players.map(f=>f.id).indexOf(roomgame.players[p].id),1);
+            roomgame.players[p].isdead=true;
+            deadenemy.push(roomgame.enemys[e]);
             break;
           }
 
         // Colisiones proyectiles enemigos contra aviones jugadores.
+
+        for (let i in deadenemy){
+          //roomgame.explosions.push(new gameobjects.explosion(roomgame.players[p].x, roomgame.players[p].y));
+          roomgame.explosions.push(new gameobjects.explosion(deadenemy[i].x, deadenemy[i].y));
+          roomgame.enemys.splice(roomgame.enemys.map(f=>f.id).indexOf(deadenemy[i].id),1);
+        }
 
       }
 
@@ -107,26 +112,31 @@ var game = function(){
   this.clientemoveright = function (id){
     var i = roomgame.players.map(e=>e.id).indexOf(id)
     if (i==-1)return;
+    if (roomgame.players[i].isdead) return;
     roomgame.players[i].x += roomgame.players[i].speed;
   };
   this.clientemoveleft = function (id){
     var i = roomgame.players.map(e=>e.id).indexOf(id)
     if (i==-1)return;
+    if (roomgame.players[i].isdead) return;
     roomgame.players[i].x -= roomgame.players[i].speed;
   };
   this.clientemoveup = function (id){
     var i = roomgame.players.map(e=>e.id).indexOf(id)
     if (i==-1)return;
+    if (roomgame.players[i].isdead) return;
     roomgame.players[i].y -= roomgame.players[i].speed;
   };
   this.clientemovedown = function (id){
     var i = roomgame.players.map(e=>e.id).indexOf(id)
     if (i==-1)return;
+    if (roomgame.players[i].isdead) return;
     roomgame.players[i].y += roomgame.players[i].speed;
   };
   this.clientfire = function(id){
     var i = roomgame.players.map(e=>e.id).indexOf(id)
     if (i==-1)return;
+    if (roomgame.players[i].isdead) return;
     if (roomgame.players[i].bullets.length<=gameconfig.BULLETNUMERS){
       var bulletid =shortid.generate();
       roomgame.players[i].bullets.push(

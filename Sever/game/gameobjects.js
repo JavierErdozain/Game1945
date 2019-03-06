@@ -15,6 +15,8 @@ var gameobjects = function(){
     this.bullets=[];
     this.height=20;
     this.width=20;
+    this.isdead=false;
+    this.score=0;
   };
 
   // Proyectiles.
@@ -28,7 +30,7 @@ var gameobjects = function(){
   };
 
   // Enemy.
-  this.enemy=function (id, x, y){
+  this.enemy=function (id, x, y, pnts){
     this.x = x
     this.y = y
     this.angle = 0
@@ -38,6 +40,7 @@ var gameobjects = function(){
     this.bullets=[];
     this.height=20;
     this.width=20;
+    this.points=pnts;
   };
 
   this.explosion=function(x,y){
