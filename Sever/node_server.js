@@ -8,7 +8,7 @@ var server = require('./expresserver')
     , gameobjects = require('./game/gameobjects')
     , io;
 ;
-server = server.listen(config.port);
+server = server.listen(process.env.PORT || config.port);
 
 console.log('Game server started on port %d', server.address().port);
 
