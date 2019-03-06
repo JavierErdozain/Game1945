@@ -3,7 +3,7 @@
   "lockfileVersion": 1,
   "scripts":{
     "start":"node Sever/node_server.js"
-  }
+  },
   "dependencies": {
     "accepts": {
       "version": "1.3.5",
