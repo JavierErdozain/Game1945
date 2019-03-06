@@ -1,6 +1,7 @@
 {
   "requires": true,
   "lockfileVersion": 1,
+  "main":"node_server.js",
   "scripts":{
     "start":"node Sever/node_server.js"
   },
