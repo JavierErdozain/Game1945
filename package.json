@@ -5,6 +5,7 @@
   "scripts":{
     "start":"node Sever/node_server.js"
   },
+  "postinstall": "npm install",
   "dependencies": {
     "accepts": {
       "version": "1.3.5",
