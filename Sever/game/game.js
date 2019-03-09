@@ -17,7 +17,7 @@ var game = function(){
   var previousTick = Date.now()
 
   var loadlevelinstructions=function(){
-    var levelconfig = JSON.parse(fs.readFileSync('game/levels/level01.json', 'utf8'));
+    var levelconfig = JSON.parse(fs.readFileSync('levels/level01.json', 'utf8'));
     levelconfig.sort((a,b) => (a.millisecond > b.millisecond) ? 1 : ((b.millisecond > a.millisecond) ? -1 : 0));
     var addenemyplane = function(act){
       roomgame.enemys.push(new gameobjects.enemy(act.id,act.x,act.y,act.points));
