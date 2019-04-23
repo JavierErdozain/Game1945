@@ -152,7 +152,7 @@ var game = function(){
   this.run=function (socket){
     socketcontroller=socket;
     loadlevelinstructions();
-    //gameLoop();
+    gameLoop();
   };
 }
 
