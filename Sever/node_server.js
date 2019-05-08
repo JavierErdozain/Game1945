@@ -27,4 +27,4 @@ io.on('connection', function(socket) {
   console.log('Client has connected to the server!' + socket.id);
 });
 
-game.run(io);
+//game.run(io);
