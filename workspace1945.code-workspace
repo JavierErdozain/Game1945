@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"name": "Game1945",
+			"path": "."
+		}
+	],
+	"settings": {
+		"githubPullRequests.remotes": [
+			"https://github.com/JavierErdozain/Game1945.git"
+		]
+	}
+}
